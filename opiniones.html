@@ -227,19 +227,19 @@
                 const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`; // Nombre único
                 
                 const { data: uploadData, error: uploadError } = await sb.storage
-                    .from('foto_url')
+                    .from('opiniones')
                     .upload(fileName, file);
 
                 if (uploadError) {
                     console.error('Error subiendo imagen:', uploadError);
-                    alert("Error al subir la imagen. Verifica el contenedor 'foto_url' en Supabase.");
+                    alert("Error al subir la imagen. Verifica el contenedor 'opiniones' en Supabase.");
                     resetSubmitButton(submitBtn);
                     return;
                 }
 
                 // Obtener URL pública de la imagen
                 const { data: publicUrlData } = sb.storage
-                    .from('foto_url')
+                    .from('opiniones')
                     .getPublicUrl(fileName);
                 
                 fotoUrlGuardada = publicUrlData.publicUrl;
