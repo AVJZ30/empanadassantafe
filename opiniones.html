@@ -179,8 +179,9 @@
     const date = new Date(review.created_at).toLocaleDateString('es-ES');
 
     const rating = Number(review.rating) || 0;
-    const empanadasStr = '🥟'.repeat(rating);
-
+const empanadasStr = Array(Number(review.calificacion) || 0)
+    .fill('🥟')
+    .join('');
     console.log("Rating:", rating);
     console.log("Empanadas:", empanadasStr);
 
@@ -272,14 +273,14 @@
             // Guardar en la tabla de la base de datos
             const { error: dbError } = await supabase
                 .from('opiniones')
-                .insert([
-                    { 
-                        nombre: nombre, 
-                        comentario: comentario, 
-                        rating: rating,
-                        foto_url: fotoUrlGuardada 
-                    }
-                ]);
+              .insert([
+{
+    nombre: nombre,
+    comentario: comentario,
+    calificacion: rating,
+    foto_url: fotoUrlGuardada
+}
+]);
 
             if (dbError) {
                 console.error('Error insertando datos:', dbError);
