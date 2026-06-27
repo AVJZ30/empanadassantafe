@@ -173,12 +173,18 @@
 
             container.innerHTML = ''; // Limpiar contenedor
             
-            data.forEach(review => {
-                const date = new Date(review.created_at).toLocaleDateString('es-ES');
-           const empanadasStr = Array(Number(review.rating) || 0)
-    .fill('🥟')
-    .join('');
-                
+           data.forEach(review => {
+    console.log(review);
+
+    const date = new Date(review.created_at).toLocaleDateString('es-ES');
+
+    const rating = Number(review.rating);
+    console.log("Rating:", rating);
+
+    const empanadasStr = '🥟'.repeat(rating || 0);
+
+    // resto del código...
+});
                 // Solo renderizar etiqueta <img> si hay una URL de foto guardada
                 const imgHTML = review.foto_url 
                     ? `<img src="${review.foto_url}" class="review-img" alt="Foto de cliente">` 
