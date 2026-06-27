@@ -102,19 +102,26 @@
     </div>
 
     <script>
-        // === 1. INICIALIZACIÓN DE SUPABASE ===
+        // === 1. INICIALIZACIÓN ===
         const SUPABASE_URL = 'https://oqmhoqvkbdfaqvsjarxx.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_yPL8mNoPzJYRt0BBdpJ4-Q_dbwgj6wH';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // === 2. Lógica del Emoji Empanada 🥟 ===
+        // === 2. LÓGICA DE CALIFICACIÓN (CORREGIDA) ===
         let currentRating = 5;
         const emojis = document.querySelectorAll('.empanada-emoji');
+        const ratingInput = document.getElementById('selectedRating');
         
         emojis.forEach(emoji => {
-            emoji.addEventListener('click', () => {
-                currentRating = parseInt(emoji.getAttribute('data-value'));
-                document.getElementById('selectedRating').value = currentRating;
+            // Usamos 'click' para asegurar la interacción
+            emoji.addEventListener('click', (e) => {
+                // Obtenemos el valor del atributo data-value
+                currentRating = parseInt(e.target.getAttribute('data-value'));
+                
+                // Guardamos el valor en el input oculto
+                ratingInput.value = currentRating;
+                
+                // Actualizamos visualmente las empanadas
                 updateRatingUI(currentRating);
             });
         });
@@ -122,6 +129,7 @@
         function updateRatingUI(rating) {
             emojis.forEach(e => {
                 const val = parseInt(e.getAttribute('data-value'));
+                // Aplicamos la clase active si el valor es menor o igual al seleccionado
                 if (val <= rating) {
                     e.classList.add('active');
                 } else {
@@ -129,7 +137,9 @@
                 }
             });
         }
-        updateRatingUI(5); // Iniciar con 5 empanadas
+
+        // Inicializar UI con 5 empanadas
+        updateRatingUI(5);
 
         // Mostrar nombre del archivo seleccionado
         document.getElementById('reviewPhoto').addEventListener('change', function(e) {
