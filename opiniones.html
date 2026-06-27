@@ -173,17 +173,34 @@
 
             container.innerHTML = ''; // Limpiar contenedor
             
-           data.forEach(review => {
+      data.forEach(review => {
     console.log(review);
 
     const date = new Date(review.created_at).toLocaleDateString('es-ES');
 
-    const rating = Number(review.rating);
+    const rating = Number(review.rating) || 0;
+    const empanadasStr = '🥟'.repeat(rating);
+
     console.log("Rating:", rating);
+    console.log("Empanadas:", empanadasStr);
 
-    const empanadasStr = '🥟'.repeat(rating || 0);
+    const imgHTML = review.foto_url
+        ? `<img src="${review.foto_url}" class="review-img" alt="Foto de cliente">`
+        : '';
 
-    // resto del código...
+    const card = `
+        <div class="review-card">
+            <div class="review-header">
+                <span class="reviewer-name">${review.nombre}</span>
+                <span class="review-date">${date}</span>
+            </div>
+            <div class="review-rating">${empanadasStr}</div>
+            <div class="review-comment">${review.comentario}</div>
+            ${imgHTML}
+        </div>
+    `;
+
+    container.innerHTML += card;
 });
                 // Solo renderizar etiqueta <img> si hay una URL de foto guardada
                 const imgHTML = review.foto_url 
