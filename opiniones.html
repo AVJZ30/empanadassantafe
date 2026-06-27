@@ -4,55 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Opiniones | Empanadas Santa Fe</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SDK DE SUPABASE AÑADIDO AQUÍ -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        :root { --primary: #F6C319; --secondary: #32104A; --bg-color: #FAFAFA; --text-color: #333333; }
-        body { background-color: var(--bg-color); color: var(--text-color); padding: 80px 5% 40px; font-family: 'Poppins', sans-serif;}
-        .container { max-width: 800px; margin: 0 auto; }
+        :root { --primary: #F6C319; --secondary: #32104A; --bg-color: #FAFAFA; --text-color: #333333; --glass-bg: #FFFFFF; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 40px 5%; }
+        .container { max-width: 900px; margin: 0 auto; }
         
-        /* Sistema de Empanadas Calificadoras */
-        .empanada-rating { display: flex; gap: 10px; cursor: pointer; font-size: 2rem; margin: 10px 0; }
-        .empanada-icon { color: #ccc; transition: transform 0.2s, color 0.3s; }
-        .empanada-icon.active { color: var(--primary); transform: scale(1.2); }
+        /* Botón de regreso */
+        .nav-btn { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; color: var(--secondary); font-weight: bold; text-decoration: none; transition: 0.3s; }
+        .nav-btn:hover { color: var(--primary); transform: translateX(-5px); }
 
-        .review-form { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 40px; }
-        .form-group { margin-bottom: 15px; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Poppins', sans-serif; }
-        .btn-submit { background: var(--secondary); color: white; padding: 12px 25px; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s;}
-        .btn-submit:hover { background: var(--primary); color: var(--secondary); }
+        h1 { text-align: center; color: var(--secondary); margin-bottom: 30px; font-size: 2.5rem; }
+
+        /* Formulario de Opiniones */
+        .review-form { background: var(--glass-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 50px; }
+        .form-title { text-align: center; margin-bottom: 20px; color: var(--secondary); }
         
-        .nav-btn { display: inline-block; margin-bottom: 20px; color: var(--secondary); font-weight: bold; text-decoration: none; }
-        .nav-btn:hover { color: var(--primary); }
+        /* Sistema de Empanadas (Emojis) */
+        .empanada-rating { display: flex; justify-content: center; gap: 15px; font-size: 2.5rem; margin: 15px 0 25px; user-select: none; }
+        .empanada-emoji { cursor: pointer; filter: grayscale(100%) opacity(0.3); transition: transform 0.2s, filter 0.3s; }
+        .empanada-emoji.active { filter: grayscale(0%) opacity(1); transform: scale(1.2); }
+
+        .form-group { margin-bottom: 15px; }
+        input[type="text"], textarea { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 1rem; transition: border-color 0.3s; }
+        input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--primary); }
+        
+        /* Input de Archivo Personalizado */
+        .file-upload { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .custom-file-upload { display: inline-block; padding: 10px 20px; cursor: pointer; background: #eee; border-radius: 10px; font-weight: 600; color: var(--text-color); transition: 0.3s; }
+        .custom-file-upload:hover { background: #ddd; }
+        input[type="file"] { display: none; }
+        .file-name { font-size: 0.9rem; color: #666; font-style: italic; }
+
+        .btn-submit { background: var(--secondary); color: white; padding: 15px 30px; border: none; border-radius: 30px; font-weight: bold; font-size: 1.1rem; cursor: pointer; width: 100%; transition: 0.3s; box-shadow: 0 5px 15px rgba(50, 16, 74, 0.2); }
+        .btn-submit:hover { background: var(--primary); color: var(--secondary); transform: translateY(-3px); }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        /* Muro de Opiniones */
+        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .review-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); display: flex; flex-direction: column; gap: 10px; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; }
+        .reviewer-name { font-weight: bold; font-size: 1.2rem; color: var(--secondary); }
+        .review-date { font-size: 0.8rem; color: #888; }
+        .review-rating { font-size: 1.2rem; }
+        .review-comment { font-size: 1rem; line-height: 1.5; color: #444; }
+        .review-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin-top: 10px; }
+        
+        .loading-text { text-align: center; color: #888; font-style: italic; width: 100%; padding: 20px; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <a href="index.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</a>
-        <h1>Lo que dicen nuestros clientes</h1>
+        
+        <h1>Comunidad Santa Fe</h1>
         
         <div class="review-form">
-            <h3>¡Califícanos con empanadas!</h3>
+            <h3 class="form-title">¡Deja tu opinión y califícanos!</h3>
+            
             <div class="empanada-rating" id="ratingContainer">
-                <i class="fa-solid fa-cookie empanada-icon" data-value="1"></i>
-                <i class="fa-solid fa-cookie empanada-icon" data-value="2"></i>
-                <i class="fa-solid fa-cookie empanada-icon" data-value="3"></i>
-                <i class="fa-solid fa-cookie empanada-icon" data-value="4"></i>
-                <i class="fa-solid fa-cookie empanada-icon" data-value="5"></i>
+                <span class="empanada-emoji" data-value="1">🥟</span>
+                <span class="empanada-emoji" data-value="2">🥟</span>
+                <span class="empanada-emoji" data-value="3">🥟</span>
+                <span class="empanada-emoji" data-value="4">🥟</span>
+                <span class="empanada-emoji" data-value="5">🥟</span>
             </div>
             <input type="hidden" id="selectedRating" value="5">
+            
             <div class="form-group">
-                <input type="text" id="reviewerName" placeholder="Tu nombre">
+                <input type="text" id="reviewerName" placeholder="Tu nombre o apodo" required>
             </div>
             <div class="form-group">
-                <textarea id="reviewerComment" rows="3" placeholder="Tu opinión..."></textarea>
+                <textarea id="reviewerComment" rows="3" placeholder="¿Qué te parecieron nuestras empanadas?" required></textarea>
             </div>
-            <button class="btn-submit" onclick="submitReview()">Publicar Opinión</button>
+            
+            <div class="file-upload">
+                <label for="reviewPhoto" class="custom-file-upload">
+                    <i class="fa-solid fa-camera"></i> Subir foto (Opcional)
+                </label>
+                <input type="file" id="reviewPhoto" accept="image/*">
+                <span class="file-name" id="fileNameDisplay">Ningún archivo seleccionado</span>
+            </div>
+
+            <button class="btn-submit" id="submitBtn" onclick="submitReview()">Publicar Opinión</button>
+        </div>
+
+        <h2 style="color: var(--secondary); margin-bottom: 20px;">Opiniones de nuestros clientes</h2>
+        <div class="reviews-grid" id="reviewsContainer">
+            <div class="loading-text">Cargando opiniones de la bandeja... 🥟</div>
         </div>
     </div>
 
@@ -62,50 +107,166 @@
         const SUPABASE_KEY = 'sb_publishable_yPL8mNoPzJYRt0BBdpJ4-Q_dbwgj6wH';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // === 2. Lógica de las empanadas (Estrellas) ===
+        // === 2. Lógica del Emoji Empanada 🥟 ===
         let currentRating = 5;
-        const icons = document.querySelectorAll('.empanada-icon');
+        const emojis = document.querySelectorAll('.empanada-emoji');
         
-        icons.forEach(icon => {
-            icon.addEventListener('click', () => {
-                currentRating = icon.getAttribute('data-value');
+        emojis.forEach(emoji => {
+            emoji.addEventListener('click', () => {
+                currentRating = parseInt(emoji.getAttribute('data-value'));
                 document.getElementById('selectedRating').value = currentRating;
                 updateRatingUI(currentRating);
             });
         });
 
         function updateRatingUI(rating) {
-            icons.forEach(i => {
-                i.classList.toggle('active', i.getAttribute('data-value') <= rating);
+            emojis.forEach(e => {
+                const val = parseInt(e.getAttribute('data-value'));
+                if (val <= rating) {
+                    e.classList.add('active');
+                } else {
+                    e.classList.remove('active');
+                }
             });
         }
-        updateRatingUI(5); // Inicializa con 5 empanadas
+        updateRatingUI(5); // Iniciar con 5 empanadas
 
-        // === 3. Guardar en Base de Datos ===
-        async function submitReview() {
-            const nombre = document.getElementById('reviewerName').value;
-            const comentario = document.getElementById('reviewerComment').value;
-            const rating = document.getElementById('selectedRating').value;
+        // Mostrar nombre del archivo seleccionado
+        document.getElementById('reviewPhoto').addEventListener('change', function(e) {
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            if(e.target.files.length > 0) {
+                fileNameDisplay.textContent = e.target.files[0].name;
+            } else {
+                fileNameDisplay.textContent = 'Ningún archivo seleccionado';
+            }
+        });
 
-            if(!nombre || !comentario) return alert("Por favor, completa todos los campos.");
+        // === 3. Cargar Opiniones Existentes ===
+        async function loadReviews() {
+            const container = document.getElementById('reviewsContainer');
             
-            // Reemplaza 'opiniones' por el nombre exacto de tu tabla en Supabase
             const { data, error } = await supabase
-                .from('opiniones') 
-                .insert([
-                    { nombre: nombre, comentario: comentario, rating: parseInt(rating) }
-                ]);
+                .from('opiniones')
+                .select('*')
+                .order('created_at', { ascending: false });
 
             if (error) {
-                console.error('Error insertando en Supabase:', error);
-                alert("Hubo un error al enviar tu opinión. Intenta de nuevo.");
+                console.error("Error cargando opiniones:", error);
+                container.innerHTML = '<p class="loading-text">No se pudieron cargar las opiniones en este momento.</p>';
+                return;
+            }
+
+            if (data.length === 0) {
+                container.innerHTML = '<p class="loading-text">¡Sé el primero en dejar tu opinión!</p>';
+                return;
+            }
+
+            container.innerHTML = ''; // Limpiar contenedor
+            
+            data.forEach(review => {
+                const date = new Date(review.created_at).toLocaleDateString('es-ES');
+                const empanadasStr = '🥟'.repeat(review.rating);
+                
+                // Solo renderizar etiqueta <img> si hay una URL de foto guardada
+                const imgHTML = review.foto_url 
+                    ? `<img src="${review.foto_url}" class="review-img" alt="Foto de cliente">` 
+                    : '';
+
+                const card = `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="reviewer-name"><i class="fa-regular fa-circle-user"></i> ${review.nombre}</span>
+                            <span class="review-date">${date}</span>
+                        </div>
+                        <div class="review-rating">${empanadasStr}</div>
+                        <div class="review-comment">"${review.comentario}"</div>
+                        ${imgHTML}
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // Cargar opiniones al abrir la página
+        window.addEventListener('load', loadReviews);
+
+        // === 4. Enviar Opinión ===
+        async function submitReview() {
+            const nombre = document.getElementById('reviewerName').value.trim();
+            const comentario = document.getElementById('reviewerComment').value.trim();
+            const rating = parseInt(document.getElementById('selectedRating').value);
+            const photoInput = document.getElementById('reviewPhoto');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if(!nombre || !comentario) {
+                alert("Por favor, ingresa tu nombre y un comentario.");
+                return;
+            }
+
+            // Deshabilitar botón para evitar doble clic
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publicando...';
+
+            let fotoUrlGuardada = null;
+
+            // Si el usuario subió una foto, primero la subimos al Storage
+            if (photoInput.files.length > 0) {
+                const file = photoInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`; // Nombre único
+                
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('fotos_opiniones')
+                    .upload(fileName, file);
+
+                if (uploadError) {
+                    console.error('Error subiendo imagen:', uploadError);
+                    alert("Error al subir la imagen. Verifica el contenedor 'fotos_opiniones' en Supabase.");
+                    resetSubmitButton(submitBtn);
+                    return;
+                }
+
+                // Obtener URL pública de la imagen
+                const { data: publicUrlData } = supabase.storage
+                    .from('fotos_opiniones')
+                    .getPublicUrl(fileName);
+                
+                fotoUrlGuardada = publicUrlData.publicUrl;
+            }
+
+            // Guardar en la tabla de la base de datos
+            const { error: dbError } = await supabase
+                .from('opiniones')
+                .insert([
+                    { 
+                        nombre: nombre, 
+                        comentario: comentario, 
+                        rating: rating,
+                        foto_url: fotoUrlGuardada 
+                    }
+                ]);
+
+            if (dbError) {
+                console.error('Error insertando datos:', dbError);
+                alert("Hubo un error al guardar tu opinión.");
             } else {
-                alert(`¡Gracias ${nombre}! Calificaste con ${rating} empanadas. Tu opinión ha sido guardada.`);
-                // Resetear campos
+                // Limpiar formulario
                 document.getElementById('reviewerName').value = '';
                 document.getElementById('reviewerComment').value = '';
+                document.getElementById('reviewPhoto').value = '';
+                document.getElementById('fileNameDisplay').textContent = 'Ningún archivo seleccionado';
                 updateRatingUI(5);
+                
+                // Recargar el muro de opiniones
+                loadReviews();
             }
+
+            resetSubmitButton(submitBtn);
+        }
+
+        function resetSubmitButton(btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Publicar Opinión';
         }
     </script>
 </body>
