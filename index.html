@@ -34,7 +34,7 @@
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
 
-        /* ================= LOADER CON TU LOGO REDONDO ================= */
+        /* ================= LOADER ================= */
         #loader {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: var(--bg-color); z-index: 9999;
@@ -43,11 +43,10 @@
         }
         .logo-loader {
             width: 150px; height: 150px;
-            /* Aquí cargamos tu logo */
             background-image: url('SantaFE.jpg'); 
             background-size: cover;
             background-position: center;
-            border-radius: 50%; /* Esto lo hace redondo */
+            border-radius: 50%;
             box-shadow: 0 0 20px rgba(246, 195, 25, 0.5);
             animation: pulse 1.5s infinite;
         }
@@ -69,8 +68,6 @@
         .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a { font-weight: 600; transition: var(--transition); }
         .nav-links a:hover { color: var(--primary); }
-        
-        .btn-theme { background: none; border: none; font-size: 1.2rem; color: var(--text-color); cursor: pointer; }
         .hamburger { display: none; font-size: 1.5rem; cursor: pointer; }
 
         /* ================= HERO SECTION ================= */
@@ -90,6 +87,8 @@
         }
         .btn-main:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(246, 195, 25, 0.6); }
 
+        .btn-small { padding: 10px 20px; font-size: 1rem; margin-top: 15px; width: fit-content; margin-left: auto; margin-right: auto; }
+
         /* ================= SECTIONS ================= */
         section { padding: 80px 5%; }
         .section-title { text-align: center; font-size: 2.5rem; color: var(--secondary); margin-bottom: 40px; }
@@ -103,7 +102,17 @@
             transition: transform 0.3s ease;
         }
         .card:hover { transform: translateY(-10px); }
-        .card i { font-size: 3rem; color: var(--primary); margin-bottom: 15px; }
+        .card i.main-icon { font-size: 3rem; color: var(--primary); margin-bottom: 15px; }
+
+        /* Botón de Copiar */
+        .btn-copy { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 1rem; margin-left: 8px; transition: 0.3s; }
+        .btn-copy:hover { color: var(--secondary); transform: scale(1.1); }
+        [data-theme="dark"] .btn-copy:hover { color: white; }
+        .copy-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.05); padding: 8px 15px; border-radius: 10px; margin-bottom: 10px; text-align: left; }
+        [data-theme="dark"] .copy-row { background: rgba(255,255,255,0.1); }
+
+        /* Info Contacto */
+        .contact-info p { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; font-size: 1.1rem; }
 
         /* Footer */
         footer { background: var(--secondary); color: white; padding: 50px 5% 20px; text-align: center; }
@@ -113,7 +122,22 @@
             color: white; font-size: 1.5rem; margin: 0 10px; transition: var(--transition);
         }
         .social-btn:hover { background: var(--primary); color: var(--secondary); transform: scale(1.1); }
-        .map-container iframe { width: 100%; height: 300px; border-radius: 15px; border: none; }
+        .map-container iframe { width: 100%; height: 250px; border-radius: 15px; border: none; }
+
+        /* Botón Modo Oscuro Flotante */
+        .floating-theme-btn {
+            position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px;
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem; color: var(--text-color); cursor: pointer;
+            box-shadow: var(--shadow); z-index: 1000; transition: 0.3s;
+        }
+        .floating-theme-btn:hover { transform: scale(1.1); background: var(--primary); color: var(--secondary); }
+
+        /* Toast Notificación */
+        .toast { position: fixed; bottom: 90px; left: 30px; background: #4caf50; color: white; padding: 10px 20px; border-radius: 30px; transition: 0.3s; z-index: 10000; opacity: 0; transform: translateY(20px); pointer-events: none; font-weight: bold; }
+        .toast.show { transform: translateY(0); opacity: 1; }
 
         /* Pantallas Pequeñas (Responsive) */
         @media (max-width: 768px) {
@@ -130,23 +154,31 @@
 </head>
 <body>
 
-    <!-- Loader con SantaFE.jpg -->
+    <!-- Loader -->
     <div id="loader">
         <div class="logo-loader"></div>
     </div>
 
+    <!-- Botón Flotante Modo Oscuro -->
+    <button class="floating-theme-btn" id="theme-toggle">
+        <i class="fa-solid fa-moon"></i>
+    </button>
+
+    <!-- Notificación Toast Copiado -->
+    <div class="toast" id="toast">¡Copiado al portapapeles!</div>
+
     <!-- Navbar -->
     <nav>
         <div class="logo">
-            <i class="fa-solid fa-moon"></i> Santa Fe
+            <i class="fa-solid fa-cookie"></i> Santa Fe
         </div>
         <div class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></div>
         <ul class="nav-links" id="nav-links">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="menu.html">Menú</a></li>
             <li><a href="opiniones.html">Opiniones</a></li>
+            <li><a href="#pagos">Pagos</a></li>
             <li><a href="#contacto">Contacto</a></li>
-            <li><button class="btn-theme" id="theme-toggle"><i class="fa-solid fa-moon"></i></button></li>
         </ul>
     </nav>
 
@@ -166,8 +198,7 @@
                 <p>Recetas artesanales pasadas de generación en generación para ofrecerte el mejor sabor.</p>
             </div>
             <div class="card">
-                <!-- 👉 PEGA_AQUÍ_TU_ENLACE_DE_PINTEREST en el url() de abajo -->
-                <div style="height: 150px; background-image: url('👉 PEGA_AQUÍ_TU_ENLACE_DE_PINTEREST'); background-color: var(--accent); background-size: cover; background-position: center; border-radius: 10px; margin-bottom: 15px;"></div>
+                <div style="height: 150px; background-image: url('URL_AQUI'); background-color: var(--accent); background-size: cover; background-position: center; border-radius: 10px; margin-bottom: 15px;"></div>
                 <h3>Calidad</h3>
                 <p>Ingredientes 100% frescos y seleccionados diariamente.</p>
             </div>
@@ -178,10 +209,48 @@
     <section id="elegirnos">
         <h2 class="section-title">¿Por qué elegirnos?</h2>
         <div class="grid-container">
-            <div class="card"><i class="fa-solid fa-leaf"></i><h3>Ingredientes Frescos</h3></div>
-            <div class="card"><i class="fa-solid fa-fire-burner"></i><h3>Recién Hechas</h3></div>
-            <div class="card"><i class="fa-solid fa-face-smile"></i><h3>Excelente Atención</h3></div>
-            <div class="card"><i class="fa-solid fa-bolt"></i><h3>Rapidez</h3></div>
+            <div class="card"><i class="fa-solid fa-leaf main-icon"></i><h3>Ingredientes Frescos</h3></div>
+            <div class="card"><i class="fa-solid fa-fire-burner main-icon"></i><h3>Recién Hechas</h3></div>
+            <div class="card"><i class="fa-solid fa-face-smile main-icon"></i><h3>Excelente Atención</h3></div>
+            <div class="card"><i class="fa-solid fa-bolt main-icon"></i><h3>Rapidez</h3></div>
+        </div>
+    </section>
+
+    <!-- Métodos de Pago -->
+    <section id="pagos">
+        <h2 class="section-title">Métodos de Pago</h2>
+        <div class="grid-container">
+            <!-- Banco Guayaquil -->
+            <div class="card">
+                <h3 style="margin-bottom: 20px; color: var(--primary);">Banco Guayaquil</h3>
+                <div class="copy-row">
+                    <span><strong>Cuenta:</strong> <span id="cta-guayaquil">[Tu Número Aquí]</span></span>
+                    <button class="btn-copy" onclick="copyText('cta-guayaquil')" title="Copiar"><i class="fa-solid fa-copy"></i></button>
+                </div>
+                <div class="copy-row">
+                    <span><strong>CI:</strong> <span id="ci-guayaquil">[Tu CI Aquí]</span></span>
+                    <button class="btn-copy" onclick="copyText('ci-guayaquil')" title="Copiar"><i class="fa-solid fa-copy"></i></button>
+                </div>
+                <div class="copy-row">
+                    <span><strong>Nombre:</strong> [Tu Nombre Aquí]</span>
+                </div>
+            </div>
+
+            <!-- Banco Pichincha -->
+            <div class="card">
+                <h3 style="margin-bottom: 20px; color: #ffdd00;">Banco Pichincha</h3>
+                <div class="copy-row">
+                    <span><strong>Cuenta:</strong> <span id="cta-pichincha">[Tu Número Aquí]</span></span>
+                    <button class="btn-copy" onclick="copyText('cta-pichincha')" title="Copiar"><i class="fa-solid fa-copy"></i></button>
+                </div>
+                <div class="copy-row">
+                    <span><strong>CI:</strong> <span id="ci-pichincha">[Tu CI Aquí]</span></span>
+                    <button class="btn-copy" onclick="copyText('ci-pichincha')" title="Copiar"><i class="fa-solid fa-copy"></i></button>
+                </div>
+                <div class="copy-row">
+                    <span><strong>Nombre:</strong> [Tu Nombre Aquí]</span>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -190,21 +259,23 @@
         <h2 class="section-title">¿Dónde Estamos?</h2>
         <div class="grid-container">
             <div class="card map-container">
-                <!-- Mapa genérico de referencia, el botón es el que manda al link real -->
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15947.669527632943!2d-79.9079!3d-2.1961!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMsKwMTEnNDYuMCJTIDc5wrU1NCcyOC40Ilc!5e0!3m2!1ses!2sec!4v1620000000000!5m2!1ses!2sec" loading="lazy"></iframe>
+                <!-- Mapa Referencial Genérico (El short link no carga en iframe) -->
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127568.10645601247!2d-80.03847849187313!3d-2.1481545465223356!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x902d13cbe26b1c97%3A0x6b245e9f8bd4bb76!2sGuayaquil%2C%20Ecuador!5e0!3m2!1ses!2sec!4v1719260500000!5m2!1ses!2sec" loading="lazy"></iframe>
             </div>
-            <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
-                <h3>Empanadas Santa Fe</h3>
-                <p><i class="fa-solid fa-clock"></i> Lunes a Sábado: 08:00 - 20:00</p>
-                <!-- BOTÓN REDIRIGE AL LINK DE GOOGLE MAPS CORTO -->
-                <button class="btn-main" onclick="window.open('https://maps.app.goo.gl/4bHByoNjFfpt3oNb9', '_blank')" style="margin-top: 20px; font-size: 1rem;">
-                    <i class="fa-solid fa-location-dot"></i> Cómo llegar
+            <div class="card contact-info" style="display: flex; flex-direction: column; justify-content: center;">
+                <h3 style="margin-bottom: 15px;">Empanadas Santa Fe</h3>
+                <p><i class="fa-solid fa-clock" style="color: var(--primary);"></i> Lunes a Sábado: 08:00 - 20:00</p>
+                <p><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Guayaquil, Ecuador</p>
+                
+                <!-- Botón Redirige a tu Link Corto -->
+                <button class="btn-main btn-small" onclick="window.open('https://maps.app.goo.gl/7UeQXQZsz274hFnu8', '_blank')">
+                    <i class="fa-solid fa-map-location-dot"></i> Cómo llegar
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- Footer Solo con Tiktok e Instagram -->
+    <!-- Footer -->
     <footer>
         <div style="margin-bottom: 20px;">
             <a href="https://www.tiktok.com/@empanadas.santafe" target="_blank" class="social-btn"><i class="fa-brands fa-tiktok"></i></a>
@@ -214,16 +285,16 @@
     </footer>
 
     <script>
-        // Loader
+        // === 1. LOADER ===
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
             setTimeout(() => {
                 loader.style.opacity = '0';
                 setTimeout(() => loader.style.display = 'none', 500);
-            }, 800); // Pequeño retraso para que se aprecie la animación del logo
+            }, 800); 
         });
 
-        // Modo Oscuro
+        // === 2. MODO OSCURO (Botón Flotante) ===
         const themeToggle = document.getElementById('theme-toggle');
         const htmlElement = document.documentElement;
         if (localStorage.getItem('theme') === 'dark') {
@@ -242,10 +313,26 @@
             }
         });
 
-        // Menú Móvil
+        // === 3. MENÚ MÓVIL ===
         const hamburger = document.getElementById('hamburger');
         const navLinks = document.getElementById('nav-links');
         hamburger.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+        // === 4. FUNCIÓN PARA COPIAR DATOS BANCARIOS ===
+        function copyText(elementId) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error("Error al copiar: ", err);
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
     </script>
 </body>
 </html>
