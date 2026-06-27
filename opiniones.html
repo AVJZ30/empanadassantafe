@@ -175,7 +175,9 @@
             
             data.forEach(review => {
                 const date = new Date(review.created_at).toLocaleDateString('es-ES');
-                const empanadasStr = '🥟'.repeat(review.rating);
+           const empanadasStr = Array(Number(review.rating) || 0)
+    .fill('🥟')
+    .join('');
                 
                 // Solo renderizar etiqueta <img> si hay una URL de foto guardada
                 const imgHTML = review.foto_url 
