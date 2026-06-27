@@ -105,23 +105,21 @@
         // === 1. INICIALIZACIÓN ===
         const SUPABASE_URL = 'https://oqmhoqvkbdfaqvsjarxx.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_yPL8mNoPzJYRt0BBdpJ4-Q_dbwgj6wH';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // OJO: el objeto global que trae el script de supabase-js también se llama "supabase".
+        // Si lo guardas en una constante con el mismo nombre ("const supabase = supabase.createClient(...)")
+        // el navegador lanza error porque la variable se referencia a sí misma antes de existir.
+        // Por eso aquí se guarda en "sb".
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // === 2. LÓGICA DE CALIFICACIÓN (CORREGIDA) ===
+        // === 2. LÓGICA DE CALIFICACIÓN ===
         let currentRating = 5;
         const emojis = document.querySelectorAll('.empanada-emoji');
         const ratingInput = document.getElementById('selectedRating');
         
         emojis.forEach(emoji => {
-            // Usamos 'click' para asegurar la interacción
             emoji.addEventListener('click', (e) => {
-                // Obtenemos el valor del atributo data-value
                 currentRating = parseInt(e.target.getAttribute('data-value'));
-                
-                // Guardamos el valor en el input oculto
                 ratingInput.value = currentRating;
-                
-                // Actualizamos visualmente las empanadas
                 updateRatingUI(currentRating);
             });
         });
@@ -129,7 +127,6 @@
         function updateRatingUI(rating) {
             emojis.forEach(e => {
                 const val = parseInt(e.getAttribute('data-value'));
-                // Aplicamos la clase active si el valor es menor o igual al seleccionado
                 if (val <= rating) {
                     e.classList.add('active');
                 } else {
@@ -155,7 +152,7 @@
         async function loadReviews() {
             const container = document.getElementById('reviewsContainer');
             
-            const { data, error } = await supabase
+            const { data, error } = await sb
                 .from('opiniones')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -172,37 +169,15 @@
             }
 
             container.innerHTML = ''; // Limpiar contenedor
-            
-      data.forEach(review => {
-    console.log(review);
 
-    const date = new Date(review.created_at).toLocaleDateString('es-ES');
+            data.forEach(review => {
+                const date = new Date(review.created_at).toLocaleDateString('es-ES');
 
-    const rating = Number(review.rating) || 0;
-const empanadasStr = Array(Number(review.calificacion) || 0)
-    .fill('🥟')
-    .join('');
-    console.log("Rating:", rating);
-    console.log("Empanadas:", empanadasStr);
+                // Campo correcto: "calificacion" (así está la columna en Supabase, no "rating")
+                const empanadasStr = Array(Number(review.calificacion) || 0)
+                    .fill('🥟')
+                    .join('');
 
-    const imgHTML = review.foto_url
-        ? `<img src="${review.foto_url}" class="review-img" alt="Foto de cliente">`
-        : '';
-
-    const card = `
-        <div class="review-card">
-            <div class="review-header">
-                <span class="reviewer-name">${review.nombre}</span>
-                <span class="review-date">${date}</span>
-            </div>
-            <div class="review-rating">${empanadasStr}</div>
-            <div class="review-comment">${review.comentario}</div>
-            ${imgHTML}
-        </div>
-    `;
-
-    container.innerHTML += card;
-});
                 // Solo renderizar etiqueta <img> si hay una URL de foto guardada
                 const imgHTML = review.foto_url 
                     ? `<img src="${review.foto_url}" class="review-img" alt="Foto de cliente">` 
@@ -251,7 +226,7 @@ const empanadasStr = Array(Number(review.calificacion) || 0)
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`; // Nombre único
                 
-                const { data: uploadData, error: uploadError } = await supabase.storage
+                const { data: uploadData, error: uploadError } = await sb.storage
                     .from('fotos_opiniones')
                     .upload(fileName, file);
 
@@ -263,24 +238,24 @@ const empanadasStr = Array(Number(review.calificacion) || 0)
                 }
 
                 // Obtener URL pública de la imagen
-                const { data: publicUrlData } = supabase.storage
+                const { data: publicUrlData } = sb.storage
                     .from('fotos_opiniones')
                     .getPublicUrl(fileName);
                 
                 fotoUrlGuardada = publicUrlData.publicUrl;
             }
 
-            // Guardar en la tabla de la base de datos
-            const { error: dbError } = await supabase
+            // Guardar en la tabla de la base de datos (columna "calificacion", no "rating")
+            const { error: dbError } = await sb
                 .from('opiniones')
-              .insert([
-{
-    nombre: nombre,
-    comentario: comentario,
-    calificacion: rating,
-    foto_url: fotoUrlGuardada
-}
-]);
+                .insert([
+                    {
+                        nombre: nombre,
+                        comentario: comentario,
+                        calificacion: rating,
+                        foto_url: fotoUrlGuardada
+                    }
+                ]);
 
             if (dbError) {
                 console.error('Error insertando datos:', dbError);
